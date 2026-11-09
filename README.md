@@ -187,8 +187,9 @@ MENDONÇA, Pedro Paulo Nogueira; DUARTE, Cláudio Roberto. Projeto de evaporador
 
 ## 8. Autores e Créditos
 
-- **Pedro Paulo Nogueira Mendonça** — Engenharia Química, UFU (Autor do código original e coautor da publicação).
-- **Prof. Dr. Cláudio Roberto Duarte** — Faculdade de Engenharia Química, UFU (Coautor e orientador).
+- **[Pedro Paulo Nogueira Mendonça](https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/)** — Engenharia Química, UFU (Autor do algoritmo, implementação computacional em C11, interface WebAssembly e coautor da publicação).
+  - LinkedIn: [linkedin.com/in/pedro-paulo-nogueira-mendonça](https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/)
+- **Prof. Dr. Cláudio Roberto Duarte** — Faculdade de Engenharia Química, UFU (Coautor e orientador acadêmico).
 
 ---
 

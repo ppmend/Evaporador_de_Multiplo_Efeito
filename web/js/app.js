@@ -1,16 +1,56 @@
 /**
  * @file app.js
  * @brief Aplicação web para controle interativo e visualização de evaporadores de múltiplo efeito.
+ * @author Pedro Paulo Nogueira Mendonça & Cláudio Roberto Duarte (UFU)
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Referências do DOM
+    // Inicializa renderização do KaTeX para as equações matemáticas
+    if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '\\[', right: '\\]', display: true },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+
+    // Configuração do Lightbox para a imagem MultiplosEfeitos.png
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const figureImgWrap = document.getElementById('figure-img-wrap');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    if (figureImgWrap && lightboxModal && lightboxImg) {
+        figureImgWrap.addEventListener('click', () => {
+            const src = figureImgWrap.querySelector('img').src;
+            lightboxImg.src = src;
+            lightboxModal.classList.add('active');
+        });
+
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target !== lightboxImg) {
+                lightboxModal.classList.remove('active');
+            }
+        });
+
+        if (lightboxClose) {
+            lightboxClose.addEventListener('click', () => {
+                lightboxModal.classList.remove('active');
+            });
+        }
+    }
+
+    // Elementos do DOM do Simulador
     const form = document.getElementById('sim-form');
     const btnCalculate = document.getElementById('btn-calculate');
     const btnReset = document.getElementById('btn-reset');
-    const statusBox = document.getElementById('sim-status');
+    const statusBox = document.getElementById('sim-status-box');
     const statusText = document.getElementById('status-text');
-    
+
     const inputEffects = document.getElementById('param-effects');
     const inputFeed = document.getElementById('param-feed');
     const inputXf = document.getElementById('param-xf');
@@ -20,8 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputTsatLast = document.getElementById('param-tsat-last');
     const inputHtc = document.getElementById('param-htc');
     const inputOmega = document.getElementById('param-omega');
-    const omegaVal = document.getElementById('omega-val');
-    
+
     // Elementos de KPI
     const kpiSteam = document.getElementById('kpi-steam');
     const kpiEconomy = document.getElementById('kpi-economy');
@@ -29,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const kpiTotalArea = document.getElementById('kpi-total-area');
     const kpiDt = document.getElementById('kpi-dt');
     const kpiBpe = document.getElementById('kpi-bpe');
-    
+
     // Tabela e exportação
     const tableBody = document.querySelector('#effects-table tbody');
     const btnExportJson = document.getElementById('btn-export-json');
@@ -41,25 +80,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let currentSimulationResult = null;
 
-    // Atualização do slider de ômega
-    if (inputOmega && omegaVal) {
-        inputOmega.addEventListener('input', (e) => {
-            omegaVal.textContent = parseFloat(e.target.value).toFixed(3);
-        });
-    }
-
-    // Inicialização da ponte WebAssembly
-    setStatus('running', 'Inicializando núcleo de cálculo WebAssembly...');
+    // Inicialização da ponte WebAssembly C
+    setStatus('running', 'Carregando núcleo numérico WebAssembly (C11)...');
     const wasmLoaded = await window.EvaporatorBridge.init();
 
     if (wasmLoaded) {
-        setStatus('ready', 'Núcleo numérico C (WebAssembly) carregado e pronto para simulação.');
-        btnCalculate.disabled = false;
-        // Executa simulação inicial automática para preencher os gráficos e a tabela
+        setStatus('ready', 'Núcleo numérico compilado em C carregado e pronto para simulação.');
+        if (btnCalculate) btnCalculate.disabled = false;
+        // Executa simulação inicial automática para preencher os gráficos e tabela
         executeSimulation();
     } else {
-        setStatus('error', 'WebAssembly não disponível localmente. Para executar simulações personalizadas no navegador, compile com Emscripten ou consulte a tabela histórica de 2026 abaixo.');
-        btnCalculate.disabled = true;
+        setStatus('error', 'Módulo WebAssembly indisponível. Para executar simulações, compile o núcleo ou consulte a Tabela 2 abaixo.');
+        if (btnCalculate) btnCalculate.disabled = true;
     }
 
     // Eventos de formulário
@@ -87,23 +119,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnExportCsv.addEventListener('click', exportCsv);
     }
 
+    // ResizeObserver para redesenhar gráficos responsivamente sempre que a tela mudar de largura
+    if (window.ResizeObserver && canvasTemp && canvasFlow) {
+        const resizeObserver = new ResizeObserver(() => {
+            if (currentSimulationResult) {
+                drawTemperatureChart(currentSimulationResult);
+                drawFlowChart(currentSimulationResult);
+            }
+        });
+        if (canvasTemp.parentElement) resizeObserver.observe(canvasTemp.parentElement);
+        if (canvasFlow.parentElement) resizeObserver.observe(canvasFlow.parentElement);
+    }
+
     function setStatus(type, message) {
         if (!statusBox || !statusText) return;
-        statusBox.className = 'sim-status status-' + type;
+        statusBox.className = 'sim-status-box status-' + type;
         statusText.textContent = message;
     }
 
     function resetToDefaults() {
-        inputEffects.value = 3;
-        inputFeed.value = 10000;
-        inputXf.value = 10;
-        inputXn.value = 50;
-        inputTf.value = 50;
-        inputTs.value = 160;
-        inputTsatLast.value = 60;
-        inputHtc.value = 2000;
-        inputOmega.value = 0.496;
-        omegaVal.textContent = "0.496";
+        if (inputEffects) inputEffects.value = 3;
+        if (inputFeed) inputFeed.value = 10000;
+        if (inputXf) inputXf.value = 10;
+        if (inputXn) inputXn.value = 50;
+        if (inputTf) inputTf.value = 50;
+        if (inputTs) inputTs.value = 160;
+        if (inputTsatLast) inputTsatLast.value = 60;
+        if (inputHtc) inputHtc.value = 2000;
+        if (inputOmega) inputOmega.value = 0.496;
     }
 
     function getFormParameters() {
@@ -130,16 +173,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Validação no front-end
         if (params.feed_conc >= params.product_conc) {
-            setStatus('error', 'A concentração final (xN) deve ser estritamente maior que a inicial (xF).');
+            setStatus('error', 'Concentração final (xN) deve ser estritamente maior que inicial (xF).');
             return;
         }
 
-        if (params.steam_temp_c <= params.last_sat_temp_c + 10) {
-            setStatus('error', 'A temperatura do vapor vivo (TS) deve ser significativamente superior à temperatura do último efeito.');
+        if (params.steam_temp_c <= params.last_sat_temp_c + 15) {
+            setStatus('error', 'Temperatura do vapor vivo (TS) insuficiente para gradiente útil.');
             return;
         }
 
-        setStatus('running', 'Calculando balanços e equalização de áreas...');
+        setStatus('running', 'Calculando balanços acoplados e equalização de áreas...');
 
         try {
             const startTime = performance.now();
@@ -148,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             currentSimulationResult = res;
             renderResults(res);
-            setStatus('ready', `Convergido em ${elapsed} ms (${res.iter_outer} iterações de área, ${res.iter_inner_total} SOR).`);
+            setStatus('ready', `Convergido em ${elapsed} ms (${res.iter_outer} ciclos de área, ${res.iter_inner_total} iterações SOR).`);
         } catch (err) {
             setStatus('error', err.message);
         }
@@ -163,68 +206,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderResults(res) {
-        // Atualiza KPIs
-        kpiSteam.textContent = formatNumber(res.steam_rate_kg_h, 1);
-        kpiEconomy.textContent = formatNumber(res.vapor_economy, 4);
-        kpiArea.textContent = formatNumber(res.area_per_effect_m2, 3);
-        kpiTotalArea.textContent = formatNumber(res.total_area_m2, 2);
-        kpiDt.textContent = formatNumber(res.total_delta_t_c, 1);
-        kpiBpe.textContent = formatNumber(res.total_bpe_c, 1);
+        if (kpiSteam) kpiSteam.textContent = formatNumber(res.steam_rate_kg_h, 1);
+        if (kpiEconomy) kpiEconomy.textContent = formatNumber(res.vapor_economy, 4);
+        if (kpiArea) kpiArea.textContent = formatNumber(res.area_per_effect_m2, 3);
+        if (kpiTotalArea) kpiTotalArea.textContent = formatNumber(res.total_area_m2, 2);
+        if (kpiDt) kpiDt.textContent = formatNumber(res.total_delta_t_c, 1);
+        if (kpiBpe) kpiBpe.textContent = formatNumber(res.total_bpe_c, 1);
 
         // Preenche Tabela
-        tableBody.innerHTML = '';
-        res.effects.forEach((ef) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${ef.effect}</strong></td>
-                <td>${formatNumber(ef.vapor_rate_kg_h, 1)}</td>
-                <td>${formatNumber(ef.liquid_rate_kg_h, 1)}</td>
-                <td>${formatNumber(ef.concentration * 100, 2)}%</td>
-                <td>${formatNumber(ef.temperature_c, 2)}</td>
-                <td>${formatNumber(ef.sat_temperature_c, 2)}</td>
-                <td>${formatNumber(ef.pressure_kpa, 2)}</td>
-                <td>${formatNumber(ef.bpe_c, 2)}</td>
-                <td>${formatNumber(ef.delta_t_c, 2)}</td>
-                <td><strong>${formatNumber(ef.area_m2, 3)}</strong></td>
-            `;
-            tableBody.appendChild(tr);
-        });
+        if (tableBody) {
+            tableBody.innerHTML = '';
+            res.effects.forEach((ef) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${ef.effect}</strong></td>
+                    <td>${formatNumber(ef.vapor_rate_kg_h, 1)}</td>
+                    <td>${formatNumber(ef.liquid_rate_kg_h, 1)}</td>
+                    <td>${formatNumber(ef.concentration * 100, 2)}%</td>
+                    <td>${formatNumber(ef.temperature_c, 2)}</td>
+                    <td>${formatNumber(ef.sat_temperature_c, 2)}</td>
+                    <td>${formatNumber(ef.pressure_kpa, 2)}</td>
+                    <td>${formatNumber(ef.bpe_c, 2)}</td>
+                    <td>${formatNumber(ef.delta_t_c, 2)}</td>
+                    <td><strong>${formatNumber(ef.area_m2, 3)}</strong></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
 
         // Desenha Gráficos Canvas
         drawTemperatureChart(res);
         drawFlowChart(res);
     }
 
-    /* Gráfico 1: Perfil Térmico (T de ebulição vs Tsat pura) */
+    /* Gráfico 1: Perfis Térmicos Responsivo */
     function drawTemperatureChart(res) {
-        if (!canvasTemp) return;
-        const ctx = canvasTemp.getContext('2d');
-        const w = canvasTemp.width = canvasTemp.offsetWidth * window.devicePixelRatio;
-        const h = canvasTemp.height = canvasTemp.offsetHeight * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        if (!canvasTemp || !canvasTemp.parentElement) return;
+        const parent = canvasTemp.parentElement;
+        const dw = parent.clientWidth || 400;
+        const dh = parent.clientHeight || 240;
 
-        const dw = canvasTemp.offsetWidth;
-        const dh = canvasTemp.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvasTemp.width = dw * dpr;
+        canvasTemp.height = dh * dpr;
+
+        const ctx = canvasTemp.getContext('2d');
+        ctx.resetTransform ? ctx.resetTransform() : ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, dw, dh);
 
-        const padLeft = 45, padRight = 20, padTop = 25, padBottom = 35;
-        const plotW = dw - padLeft - padRight;
-        const plotH = dh - padTop - padBottom;
+        const padLeft = 45, padRight = 20, padTop = 30, padBottom = 35;
+        const plotW = Math.max(dw - padLeft - padRight, 50);
+        const plotH = Math.max(dh - padTop - padBottom, 50);
 
         const n = res.effects.length;
         const tSol = res.effects.map(e => e.temperature_c);
         const tSat = res.effects.map(e => e.sat_temperature_c);
-        const maxT = Math.max(...tSol, res.steam_rate_kg_h ? 170 : 150) + 10;
+        const maxT = Math.max(...tSol, 160) + 10;
         const minT = Math.min(...tSat) - 10;
 
         const getY = (val) => padTop + plotH - ((val - minT) / (maxT - minT)) * plotH;
-        const getX = (idx) => padLeft + (idx / (n - 1 || 1)) * plotW;
+        const getX = (idx) => padLeft + (idx / Math.max(n - 1, 1)) * plotW;
 
-        // Eixos e grade
-        ctx.strokeStyle = '#E2DDD5';
+        // Grade e Eixos
+        ctx.strokeStyle = '#E5E2DC';
         ctx.lineWidth = 1;
-        ctx.fillStyle = '#7E8695';
-        ctx.font = '10px JetBrains Mono';
+        ctx.fillStyle = '#727D8C';
+        ctx.font = '10px "JetBrains Mono", monospace';
 
         for (let t = Math.ceil(minT / 20) * 20; t <= maxT; t += 20) {
             const y = getY(t);
@@ -232,13 +280,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.moveTo(padLeft, y);
             ctx.lineTo(dw - padRight, y);
             ctx.stroke();
-            ctx.fillText(t + '°C', 5, y + 3);
+            ctx.fillText(t + '°C', 8, y + 3);
         }
 
         // Curva Tsat (Água Pura)
         ctx.beginPath();
-        ctx.strokeStyle = '#1A5F8E';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#143D66';
+        ctx.lineWidth = 2;
         for (let i = 0; i < n; i++) {
             const x = getX(i);
             const y = getY(tSat[i]);
@@ -249,8 +297,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Curva Tsol (Solução com EPE)
         ctx.beginPath();
-        ctx.strokeStyle = '#C25425';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#A3361E';
+        ctx.lineWidth = 2;
         for (let i = 0; i < n; i++) {
             const x = getX(i);
             const y = getY(tSol[i]);
@@ -259,50 +307,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         ctx.stroke();
 
-        // Pontos e rótulos do eixo X
+        // Pontos e rótulos
         for (let i = 0; i < n; i++) {
             const x = getX(i);
-            // Ponto Tsat
-            ctx.fillStyle = '#1A5F8E';
+            ctx.fillStyle = '#143D66';
             ctx.beginPath();
-            ctx.arc(x, getY(tSat[i]), 4, 0, Math.PI * 2);
+            ctx.arc(x, getY(tSat[i]), 3.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Ponto Tsol
-            ctx.fillStyle = '#C25425';
+            ctx.fillStyle = '#A3361E';
             ctx.beginPath();
-            ctx.arc(x, getY(tSol[i]), 4, 0, Math.PI * 2);
+            ctx.arc(x, getY(tSol[i]), 3.5, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = '#1C1D1F';
+            ctx.fillStyle = '#1C2024';
             ctx.fillText(`Ef. ${i + 1}`, x - 12, dh - 10);
         }
 
-        // Legenda
-        ctx.fillStyle = '#C25425';
-        ctx.fillRect(dw - 180, 8, 10, 10);
-        ctx.fillText('T solução (com EPE)', dw - 165, 17);
+        // Legenda no topo
+        ctx.fillStyle = '#A3361E';
+        ctx.fillRect(dw - 195, 10, 8, 8);
+        ctx.fillText('T solução (com EPE)', dw - 182, 17);
 
-        ctx.fillStyle = '#1A5F8E';
-        ctx.fillRect(dw - 180, 22, 10, 10);
-        ctx.fillText('Tsat pura', dw - 165, 31);
+        ctx.fillStyle = '#143D66';
+        ctx.fillRect(dw - 95, 10, 8, 8);
+        ctx.fillText('Tsat pura', dw - 82, 17);
     }
 
-    /* Gráfico 2: Vazões de Vapor e Líquido */
+    /* Gráfico 2: Vazões Mássicas Responsivo */
     function drawFlowChart(res) {
-        if (!canvasFlow) return;
-        const ctx = canvasFlow.getContext('2d');
-        const w = canvasFlow.width = canvasFlow.offsetWidth * window.devicePixelRatio;
-        const h = canvasFlow.height = canvasFlow.offsetHeight * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        if (!canvasFlow || !canvasFlow.parentElement) return;
+        const parent = canvasFlow.parentElement;
+        const dw = parent.clientWidth || 400;
+        const dh = parent.clientHeight || 240;
 
-        const dw = canvasFlow.offsetWidth;
-        const dh = canvasFlow.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvasFlow.width = dw * dpr;
+        canvasFlow.height = dh * dpr;
+
+        const ctx = canvasFlow.getContext('2d');
+        ctx.resetTransform ? ctx.resetTransform() : ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, dw, dh);
 
-        const padLeft = 55, padRight = 20, padTop = 25, padBottom = 35;
-        const plotW = dw - padLeft - padRight;
-        const plotH = dh - padTop - padBottom;
+        const padLeft = 55, padRight = 20, padTop = 30, padBottom = 35;
+        const plotW = Math.max(dw - padLeft - padRight, 50);
+        const plotH = Math.max(dh - padTop - padBottom, 50);
 
         const n = res.effects.length;
         const maxFlow = Math.max(...res.effects.map(e => Math.max(e.liquid_rate_kg_h, e.vapor_rate_kg_h))) * 1.15;
@@ -310,55 +360,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         const getY = (val) => padTop + plotH - (val / maxFlow) * plotH;
 
         // Grade
-        ctx.strokeStyle = '#E2DDD5';
+        ctx.strokeStyle = '#E5E2DC';
         ctx.lineWidth = 1;
-        ctx.fillStyle = '#7E8695';
-        ctx.font = '10px JetBrains Mono';
+        ctx.fillStyle = '#727D8C';
+        ctx.font = '10px "JetBrains Mono", monospace';
 
-        for (let f = 0; f <= maxFlow; f += 2500) {
+        const step = Math.ceil((maxFlow / 4) / 1000) * 1000;
+        for (let f = 0; f <= maxFlow; f += step) {
             const y = getY(f);
             ctx.beginPath();
             ctx.moveTo(padLeft, y);
             ctx.lineTo(dw - padRight, y);
             ctx.stroke();
-            ctx.fillText(f.toLocaleString('pt-BR'), 5, y + 3);
+            ctx.fillText(f.toLocaleString('pt-BR'), 8, y + 3);
         }
 
         const barGroupW = plotW / n;
-        const barW = Math.min(barGroupW * 0.35, 26);
+        const barW = Math.min(barGroupW * 0.35, 22);
 
         res.effects.forEach((ef, i) => {
-            const groupX = padLeft + i * barGroupW + (barGroupW - barW * 2 - 6) / 2;
+            const groupX = padLeft + i * barGroupW + (barGroupW - barW * 2 - 4) / 2;
 
             // Barra V (Vapor)
             const yV = getY(ef.vapor_rate_kg_h);
-            ctx.fillStyle = '#1A5F8E';
+            ctx.fillStyle = '#143D66';
             ctx.fillRect(groupX, yV, barW, padTop + plotH - yV);
 
             // Barra L (Líquido)
             const yL = getY(ef.liquid_rate_kg_h);
-            ctx.fillStyle = '#226743';
-            ctx.fillRect(groupX + barW + 6, yL, barW, padTop + plotH - yL);
+            ctx.fillStyle = '#1C5438';
+            ctx.fillRect(groupX + barW + 4, yL, barW, padTop + plotH - yL);
 
-            // Rótulo Efeito
-            ctx.fillStyle = '#1C1D1F';
+            ctx.fillStyle = '#1C2024';
             ctx.fillText(`Ef. ${i + 1}`, groupX + barW - 6, dh - 10);
         });
 
-        // Legenda
-        ctx.fillStyle = '#1A5F8E';
-        ctx.fillRect(dw - 170, 8, 10, 10);
-        ctx.fillText('Vapor V (kg/h)', dw - 155, 17);
+        // Legenda no topo
+        ctx.fillStyle = '#143D66';
+        ctx.fillRect(dw - 180, 10, 8, 8);
+        ctx.fillText('Vapor V (kg/h)', dw - 167, 17);
 
-        ctx.fillStyle = '#226743';
-        ctx.fillRect(dw - 170, 22, 10, 10);
-        ctx.fillText('Líquido L (kg/h)', dw - 155, 31);
+        ctx.fillStyle = '#1C5438';
+        ctx.fillRect(dw - 95, 10, 8, 8);
+        ctx.fillText('Líquido L (kg/h)', dw - 82, 17);
     }
 
     function exportJson() {
         if (!currentSimulationResult) return;
         const blob = new Blob([JSON.stringify(currentSimulationResult, null, 2)], { type: 'application/json' });
-        downloadBlob(blob, `simulacao_evaporador_N${currentSimulationResult.n_effects}.json`);
+        downloadBlob(blob, `simulacao_evaporadores_N${currentSimulationResult.n_effects}.json`);
     }
 
     function exportCsv() {
@@ -368,7 +418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             csv += `${e.effect},${e.vapor_rate_kg_h.toFixed(2)},${e.liquid_rate_kg_h.toFixed(2)},${e.concentration.toFixed(4)},${e.temperature_c.toFixed(2)},${e.sat_temperature_c.toFixed(2)},${e.pressure_kpa.toFixed(2)},${e.bpe_c.toFixed(2)},${e.delta_t_c.toFixed(2)},${e.area_m2.toFixed(3)}\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        downloadBlob(blob, `simulacao_evaporador_N${currentSimulationResult.n_effects}.csv`);
+        downloadBlob(blob, `simulacao_evaporadores_N${currentSimulationResult.n_effects}.csv`);
     }
 
     function downloadBlob(blob, filename) {
@@ -379,4 +429,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         URL.revokeObjectURL(link.href);
     }
 });
-

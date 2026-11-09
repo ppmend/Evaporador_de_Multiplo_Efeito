@@ -4,135 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dimensionamento de Evaporadores de Múltiplo Efeito | Engenharia Química UFU</title>
-    <meta name="description" content="Simulador e modelagem computacional para dimensionamento de evaporadores de múltiplo efeito com pressão variável e elevação do ponto de ebulição (EPE).">
+    <meta name="description" content="Modelagem e dimensionamento de evaporadores de múltiplo efeito com pressão variável e elevação do ponto de ebulição (EPE). Universidade Federal de Uberlândia.">
+
+    <!-- KaTeX para renderização de equações em LaTeX com tipografia científica idêntica a PDF -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Navegação -->
-    <nav class="navbar" aria-label="Navegação principal">
-        <div class="nav-container">
-            <a href="#" class="nav-brand">EVAP<span>//</span>SIM</a>
+    <!-- Barra Institucional Superior -->
+    <aside class="top-bar" aria-label="Informações institucionais">
+        <div class="top-bar-inner">
+            <span class="inst-title">Universidade Federal de Uberlândia — Faculdade de Engenharia Química (FEQUI)</span>
+            <span class="inst-badge">XVI COBEQ-IC (UNICAMP, 2026)</span>
+        </div>
+    </aside>
+
+    <!-- Navegação Principal -->
+    <nav class="main-nav" aria-label="Navegação da publicação">
+        <div class="nav-inner">
+            <a href="#" class="site-title">Evaporadores de Múltiplo Efeito</a>
             <ul class="nav-links">
-                <li><a href="#visao-geral">Visão Geral</a></li>
-                <li><a href="#resultados-artigo">Dados 2026</a></li>
+                <li><a href="#artigo">Artigo</a></li>
+                <li><a href="#fluxograma">Processo</a></li>
+                <li><a href="#tabela-artigo">Resultados 2026</a></li>
                 <li><a href="#simulador">Simulador</a></li>
-                <li><a href="#modelo">Modelo</a></li>
-                <li><a href="#publicacao">Publicação</a></li>
+                <li><a href="#modelo-matematico">Equações</a></li>
+                <li><a href="#metodo-numerico">Método</a></li>
+                <li><a href="#autoria">Autoria</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero / Abertura -->
-    <header class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <span class="hero-badge">Engenharia Química // COBEQ-IC 2026</span>
-                <h1>Dimensionamento de evaporadores de múltiplo efeito</h1>
-                <p class="lead">
-                    Modelagem de balanços acoplados de massa e energia com pressão variável e elevação do ponto de ebulição — implementação numérica de alto desempenho em C e simulação interativa no navegador.
-                </p>
-                <div class="hero-actions">
-                    <a href="#simulador" class="btn btn-primary">Executar Simulação</a>
-                    <a href="#publicacao" class="btn btn-secondary">Consultar Artigo</a>
+    <!-- Cabeçalho do Artigo / Hero Editorial -->
+    <header id="artigo" class="article-header">
+        <div class="header-inner">
+            <div class="article-category">Engenharia Química // Operações Unitárias // Simulação Numérica</div>
+            <h1 class="article-title">Projeto de evaporadores de múltiplo efeito com influência da pressão e EPE</h1>
+            <p class="article-subtitle">
+                Modelagem acoplada de balanços de massa e energia com variação de pressão inter-efeitos, elevação do ponto de ebulição da solução aquosa de NaOH e restrição construtiva de áreas idênticas.
+            </p>
+
+            <!-- Box de Autores com LinkedIn em Destaque -->
+            <div class="authors-box">
+                <div class="author-item">
+                    <span class="author-name">
+                        Pedro Paulo Nogueira Mendonça
+                        <a href="https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="linkedin-badge" 
+                           title="Perfil de Pedro Paulo Nogueira Mendonça no LinkedIn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            LinkedIn
+                        </a>
+                    </span>
+                    <span class="author-affiliation">Autor do algoritmo, implementação computacional em C e simulações</span>
+                </div>
+
+                <div class="author-item">
+                    <span class="author-name">Prof. Dr. Cláudio Roberto Duarte</span>
+                    <span class="author-affiliation">Coautor e Orientador acadêmico — Faculdade de Engenharia Química (UFU)</span>
                 </div>
             </div>
 
-            <!-- Diagrama vetorial original do processo de evaporação em série -->
-            <div class="hero-diagram-card">
-                <div class="diagram-header">
-                    <span class="diagram-title">Diagrama de Fluxo — Alimentação Direta (Forward Feed)</span>
-                </div>
-                <div class="diagram-svg-wrap">
-                    <svg viewBox="0 0 540 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Diagrama esquemático de bateria de 3 evaporadores em série com alimentação direta">
-                        <!-- Evaporador 1 -->
-                        <rect x="50" y="55" width="85" height="130" rx="6" fill="#1E3247" stroke="#3A5370" stroke-width="2"/>
-                        <path d="M50 75 Q92 65 135 75" stroke="#C25425" stroke-width="2" fill="none"/>
-                        <text x="92" y="125" fill="#FFFFFF" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" text-anchor="middle">Efeito 1</text>
-                        <text x="92" y="142" fill="#A2B0C4" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">P₁, T₁</text>
-
-                        <!-- Evaporador 2 -->
-                        <rect x="210" y="55" width="85" height="130" rx="6" fill="#1E3247" stroke="#3A5370" stroke-width="2"/>
-                        <path d="M210 82 Q252 72 295 82" stroke="#C25425" stroke-width="2" fill="none"/>
-                        <text x="252" y="125" fill="#FFFFFF" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" text-anchor="middle">Efeito 2</text>
-                        <text x="252" y="142" fill="#A2B0C4" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">P₂, T₂</text>
-
-                        <!-- Evaporador 3 -->
-                        <rect x="370" y="55" width="85" height="130" rx="6" fill="#1E3247" stroke="#3A5370" stroke-width="2"/>
-                        <path d="M370 90 Q412 80 455 90" stroke="#C25425" stroke-width="2" fill="none"/>
-                        <text x="412" y="125" fill="#FFFFFF" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" text-anchor="middle">Efeito 3</text>
-                        <text x="412" y="142" fill="#A2B0C4" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">P₃, T₃</text>
-
-                        <!-- Corrente de Alimentação F -->
-                        <path d="M10 115 L50 115" stroke="#48BB78" stroke-width="2.5" marker-end="url(#arrow)"/>
-                        <text x="28" y="105" fill="#48BB78" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">F, xF</text>
-
-                        <!-- Vapor Vivo S -->
-                        <path d="M92 10 L92 55" stroke="#F6AD55" stroke-width="2.5"/>
-                        <text x="92" y="30" fill="#F6AD55" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="end">S (TS) </text>
-
-                        <!-- Vapor V1 -> Efeito 2 -->
-                        <path d="M92 55 L92 35 Q92 25 102 25 L190 25 Q200 25 200 35 L200 95 L210 95" stroke="#63B3ED" stroke-width="2" fill="none"/>
-                        <text x="146" y="20" fill="#63B3ED" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">V₁</text>
-
-                        <!-- Líquido L1 -> Efeito 2 -->
-                        <path d="M135 150 L210 150" stroke="#48BB78" stroke-width="2"/>
-                        <text x="172" y="143" fill="#48BB78" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">L₁</text>
-
-                        <!-- Vapor V2 -> Efeito 3 -->
-                        <path d="M252 55 L252 35 Q252 25 262 25 L350 25 Q360 25 360 35 L360 95 L370 95" stroke="#63B3ED" stroke-width="2" fill="none"/>
-                        <text x="306" y="20" fill="#63B3ED" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">V₂</text>
-
-                        <!-- Líquido L2 -> Efeito 3 -->
-                        <path d="M295 150 L370 150" stroke="#48BB78" stroke-width="2"/>
-                        <text x="332" y="143" fill="#48BB78" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">L₂</text>
-
-                        <!-- Vapor V3 -> Condensador -->
-                        <path d="M412 55 L412 35 Q412 25 422 25 L500 25" stroke="#63B3ED" stroke-width="2" fill="none"/>
-                        <text x="475" y="20" fill="#63B3ED" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">V₃ (Cond.)</text>
-
-                        <!-- Concentrado Final LN -->
-                        <path d="M455 150 L520 150" stroke="#48BB78" stroke-width="2.5"/>
-                        <text x="490" y="143" fill="#48BB78" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">LN, xN</text>
-
-                        <!-- Linha de gradiente de pressão -->
-                        <line x1="50" y1="210" x2="455" y2="210" stroke="#718096" stroke-dasharray="4 4"/>
-                        <text x="252" y="225" fill="#A0AEC0" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">Gradiente decrescente: P₁ > P₂ > P₃</text>
-                    </svg>
-                </div>
+            <div class="header-actions">
+                <a href="#simulador" class="btn btn-primary">Abrir Simulador Interativo</a>
+                <a href="artigo-cobeqic-evaporador-multiplo-efeito.pdf" target="_blank" download class="btn btn-secondary">
+                    Baixar Artigo Completo (PDF)
+                </a>
             </div>
         </div>
     </header>
 
-    <!-- Seção 1: Visão Geral e Relevância -->
-    <section id="visao-geral">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Fundamentação de Processos</span>
-                <h2>Por que múltiplos efeitos com pressão variável e EPE?</h2>
-                <p>O desafio computacional do acoplamento não linear de balanços térmicos e materiais na indústria de processos químicos.</p>
+    <!-- Seção de Figura Técnica Principal (MúltiplosEfeitos.png) -->
+    <section id="fluxograma" class="figure-section">
+        <div class="figure-container">
+            <div class="figure-card">
+                <div id="figure-img-wrap" class="figure-img-wrap" title="Clique para ampliar a imagem em alta resolução">
+                    <img src="assets/MultiplosEfeitos.png" alt="Fluxograma detalhado de bateria de evaporadores de múltiplos efeitos em alimentação direta com instrumentação e controle de correntes">
+                    <span class="zoom-hint">Clique para expandir</span>
+                </div>
+                <div class="figure-caption">
+                    <strong>Figura 1 — Fluxograma esquemático de um sistema de evaporadores de múltiplo efeito com alimentação direta (forward feed).</strong>
+                    A corrente de alimentação diluída ($F$, com fração mássica de NaOH $x_F$) entra no primeiro efeito junto ao vapor vivo saturado de caldeira ($S$, a temperatura $T_S$). O vapor gerado na câmara de evaporação ($V_1$) é conduzido como fluido de aquecimento para o corpo de aquecimento do segundo efeito, reutilizando o calor latente de vaporização. O processo se repete sequencialmente ao longo de $N$ estágios sob pressões decrescentes ($P_1 > P_2 > \dots > P_N$), até a extração do concentrado final ($L_N$, $x_N$) e condensação de $V_N$ no condensador barométrico.
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-num">01</div>
-                    <h3>Eficiência Energética</h3>
+    <!-- Modal Lightbox para Ampliação da Imagem Original -->
+    <div id="lightbox-modal" class="lightbox-modal" aria-hidden="true" role="dialog" aria-label="Visualizador de imagem em alta resolução">
+        <button id="lightbox-close" class="lightbox-close" aria-label="Fechar visualização">&times;</button>
+        <img id="lightbox-img" src="" alt="Ampliação do esquema do evaporador">
+    </div>
+
+    <!-- Seção 1: Fundamentação e Relevância -->
+    <section class="content-section">
+        <div class="section-container">
+            <span class="section-eyebrow">Fundamentação de Processos</span>
+            <h2 class="section-title">Contexto Tecnológico e Desafio Computacional</h2>
+            <p class="section-lead">
+                A evaporação é uma das operações unitárias mais intensivas em energia da indústria de processos químicos. Empregada em larga escala na concentração de soda cáustica (NaOH), caldo de açúcar, licor negro na indústria de papel e celulose e tratamento de efluentes salinos, a eficiência do processo depende criticamente da reutilização térmica em múltiplos efeitos.
+            </p>
+
+            <div class="editorial-grid">
+                <div class="editorial-col">
+                    <h3>Multiplicação da Economia de Vapor</h3>
                     <p>
-                        A evaporação de múltiplos efeitos reutiliza o calor latente do vapor gerado no estágio anterior como fluido de aquecimento do estágio seguinte, multiplicando a economia de vapor e reduzindo drasticamente os custos operacionais.
+                        Em um evaporador de simples efeito, para evaporar aproximadamente $1\text{ kg}$ de água é necessário condensar cerca de $1\text{ a }1,2\text{ kg}$ de vapor vivo. Ao associar múltiplos estágios em série, o vapor de água gerado na ebulição da solução serve como meio térmico para o estágio subsequente, permitindo alcançar economias de vapor superiores a $2,4\text{ kg evaporado / kg vapor vivo}$ para $N \ge 6$.
                     </p>
                 </div>
-                <div class="card">
-                    <div class="card-num">02</div>
-                    <h3>Elevação do Ponto de Ebulição</h3>
+
+                <div class="editorial-col">
+                    <h3>Penalidade Termodinâmica da EPE</h3>
                     <p>
-                        À medida que a solução de NaOH se concentra ao longo dos efeitos (de 10% a 50%), a pressão de vapor diminui e a temperatura de ebulição aumenta significativamente (EPE). Desprezar a EPE superestima a força motriz térmica útil e subdimensiona a área.
+                        A presença de soluto não volátil reduz a pressão de vapor do solvente e eleva a temperatura de ebulição da mistura líquida em relação à água pura na mesma pressão. À medida que o NaOH se concentra de $10\%$ para $50\%$, a EPE atinge valores superiores a $42\text{ °C}$ no último efeito, reduzindo expressivamente o gradiente térmico motriz disponível ($\Delta T$) para a troca de calor.
                     </p>
                 </div>
-                <div class="card">
-                    <div class="card-num">03</div>
-                    <h3>Igualdade de Áreas Construtiva</h3>
+
+                <div class="editorial-col">
+                    <h3>Acoplamento Não Linear e Áreas Iguais</h3>
                     <p>
-                        Na prática industrial, os evaporadores são fabricados com áreas de troca térmica idênticas (A₁ = A₂ = ... = Aₙ) para padronização e economia de escala. O algoritmo redistribui iterativamente as quedas térmicas locais (ΔTᵢ) até atingir resíduos nulos.
+                        Por razões econômicas e de manutenção industrial, adota-se a restrição de áreas construtivas idênticas ($A_1 = A_2 = \cdots = A_N$). Como as taxas de transferência de calor, as propriedades físicas locais e as temperaturas dependem mutuamente das vazões e pressões intermediárias, o dimensionamento resulta em um sistema não linear acoplado que exige métodos iterativos robustos.
                     </p>
                 </div>
             </div>
@@ -140,112 +137,112 @@
     </section>
 
     <!-- Seção 2: Resultados Publicados no Artigo (COBEQ-IC 2026) -->
-    <section id="resultados-artigo" style="background-color: var(--bg-surface-alt);">
+    <section id="tabela-artigo" class="content-section" style="background-color: var(--bg-surface-warm);">
         <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Linha de Base Científica</span>
-                <h2>Resultados Publicados no Artigo (COBEQ-IC 2026)</h2>
-                <p>Dados de referência rigorosamente reproduzidos pelo novo solver para sistemas de 2 a 7 efeitos operando nas condições do caso-base.</p>
-            </div>
+            <span class="section-eyebrow">Linha de Base do Artigo</span>
+            <h2 class="section-title">Resultados de Referência Publicados (Tabela 2)</h2>
+            <p class="section-lead">
+                Valores originais obtidos para o caso-base de concentração de soda cáustica: $F = 10.000\text{ kg/h}$, $x_F = 10\%$, $x_N = 50\%$, $T_F = 50\text{ °C}$, $T_S = 160\text{ °C}$, $T_{sat,N} = 60\text{ °C}$ e $U = 2.000\text{ W/(m²·K)}$ em todos os estágios. Tolerância numérica: $10^{-10}$.
+            </p>
 
-            <div class="table-card">
-                <div class="table-responsive">
-                    <table class="data-table" aria-label="Tabela 2 do artigo COBEQ-IC 2026 com resultados de dimensionamento">
-                        <thead>
-                            <tr>
-                                <th scope="col">Efeitos (N)</th>
-                                <th scope="col">Área por Efeito (m²)</th>
-                                <th scope="col">Vapor Vivo S (kg/h)</th>
-                                <th scope="col">Economia (E)</th>
-                                <th scope="col">ω Ótimo (SOR)</th>
-                                <th scope="col">Limite Superior ω</th>
-                                <th scope="col">Área Total (m²)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>N = 2</strong></td>
-                                <td>58,083</td>
-                                <td>5.940,4</td>
-                                <td>1,3467</td>
-                                <td>0,665</td>
-                                <td>0,988</td>
-                                <td>116,166</td>
-                            </tr>
-                            <tr>
-                                <td><strong>N = 3</strong></td>
-                                <td>70,128</td>
-                                <td>4.593,6</td>
-                                <td>1,7415</td>
-                                <td>0,496</td>
-                                <td>0,937</td>
-                                <td>210,384</td>
-                            </tr>
-                            <tr>
-                                <td><strong>N = 4</strong></td>
-                                <td>89,608</td>
-                                <td>3.949,4</td>
-                                <td>2,0256</td>
-                                <td>0,445</td>
-                                <td>0,884</td>
-                                <td>358,432</td>
-                            </tr>
-                            <tr>
-                                <td><strong>N = 5</strong></td>
-                                <td>125,442</td>
-                                <td>3.585,8</td>
-                                <td>2,2310</td>
-                                <td>0,429</td>
-                                <td>0,823</td>
-                                <td>627,210</td>
-                            </tr>
-                            <tr>
-                                <td><strong>N = 6</strong></td>
-                                <td>211,225</td>
-                                <td>3.363,0</td>
-                                <td>2,3788</td>
-                                <td>0,377</td>
-                                <td>0,743</td>
-                                <td>1.267,350</td>
-                            </tr>
-                            <tr>
-                                <td><strong>N = 7</strong></td>
-                                <td>684,210</td>
-                                <td>3.221,2</td>
-                                <td>2,4836</td>
-                                <td>0,345</td>
-                                0,613</td>
-                                <td>4.789,470</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="table-footer-note">
+            <div class="table-scroll-container">
+                <table class="academic-table" aria-label="Resultados da Tabela 2 do artigo publicado no XVI COBEQ-IC 2026">
+                    <thead>
+                        <tr>
+                            <th scope="col">Efeitos ($N$)</th>
+                            <th scope="col">Área por Efeito ($A_i$, m²)</th>
+                            <th scope="col">Vapor Vivo ($S$, kg/h)</th>
+                            <th scope="col">Economia de Vapor ($E$)</th>
+                            <th scope="col">Fator Ótimo $\omega$ (SOR)</th>
+                            <th scope="col">Limite Superior $\omega$</th>
+                            <th scope="col">Área Total Instalada ($\sum A_i$, m²)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>2 Efeitos</strong></td>
+                            <td>58,083</td>
+                            <td>5.940,4</td>
+                            <td>1,3467</td>
+                            <td>0,665</td>
+                            <td>0,988</td>
+                            <td>116,166</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3 Efeitos</strong></td>
+                            <td>70,128</td>
+                            <td>4.593,6</td>
+                            <td>1,7415</td>
+                            <td>0,496</td>
+                            <td>0,937</td>
+                            <td>210,384</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4 Efeitos</strong></td>
+                            <td>89,608</td>
+                            <td>3.949,4</td>
+                            <td>2,0256</td>
+                            <td>0,445</td>
+                            <td>0,884</td>
+                            <td>358,432</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5 Efeitos</strong></td>
+                            <td>125,442</td>
+                            <td>3.585,8</td>
+                            <td>2,2310</td>
+                            <td>0,429</td>
+                            <td>0,823</td>
+                            <td>627,210</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6 Efeitos</strong></td>
+                            <td>211,225</td>
+                            <td>3.363,0</td>
+                            <td>2,3788</td>
+                            <td>0,377</td>
+                            <td>0,743</td>
+                            <td>1.267,350</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7 Efeitos</strong></td>
+                            <td>684,210</td>
+                            <td>3.221,2</td>
+                            <td>2,4836</td>
+                            <td>0,345</td>
+                            <td>0,613</td>
+                            <td>4.789,470</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="table-footer">
                     <strong>Fonte:</strong> MENDONÇA, P. P. N.; DUARTE, C. R. <em>Projeto de evaporadores de múltiplo efeito com influência da pressão e EPE</em>. XVI COBEQ-IC, UNICAMP, 2026.
-                    Condições: F = 10.000 kg/h, xF = 10%, xN = 50%, TF = 50°C, TS = 160°C, Tsat,N = 60°C, U = 2.000 W/(m²·K). Tolerância numérica: 10⁻¹⁰.
+                    Nota técnica: A área reportada na Tabela 2 refere-se à superfície de troca térmica de <em>cada um</em> dos $N$ efeitos individuais idênticos.
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seção 3: Simulador Interativo -->
-    <section id="simulador">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Ambiente Computacional</span>
-                <h2>Simulador Interativo em Tempo Real</h2>
-                <p>Execute simulações customizadas conectadas diretamente ao núcleo numérico compilado em C via WebAssembly.</p>
-            </div>
+    <!-- ==============================================================================
+         SEÇÃO DO SIMULADOR (CORREÇÃO TOTAL DE OVERFLOW & CANVAS RESPONSIVOS)
+         ============================================================================== -->
+    <section id="simulador" class="sim-section">
+        <div class="sim-container">
+            <span class="section-eyebrow">Ambiente Interativo de Simulação</span>
+            <h2 class="section-title">Simulador Numérico Acoplado (WebAssembly C11)</h2>
+            <p class="section-lead">
+                O cálculo abaixo executa diretamente no seu navegador o mesmo código C11 de alta performance desenvolvido para o estudo, via WebAssembly compilado sem aproximações.
+            </p>
 
-            <div class="simulator-layout">
-                <!-- Painel de Parâmetros -->
-                <div class="sim-panel">
-                    <form id="sim-form">
-                        <div class="form-group">
-                            <label for="param-effects">Número de Efeitos (N) <span class="unit">estágios</span></label>
-                            <select id="param-effects" class="form-control">
+            <!-- Card de Parâmetros de Entrada -->
+            <div class="sim-controls-card">
+                <form id="sim-form">
+                    <div class="controls-grid">
+                        <div class="form-item">
+                            <label for="param-effects">Número de Efeitos ($N$) <span class="unit">[estágios]</span></label>
+                            <select id="param-effects" class="form-input">
                                 <option value="2">2 Efeitos</option>
-                                <option value="3" selected>3 Efeitos (Caso Padrão)</option>
+                                <option value="3" selected>3 Efeitos (Caso-Base)</option>
                                 <option value="4">4 Efeitos</option>
                                 <option value="5">5 Efeitos</option>
                                 <option value="6">6 Efeitos</option>
@@ -253,205 +250,307 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-feed">Vazão de Alimentação (F) <span class="unit">kg/h</span></label>
-                            <input type="number" id="param-feed" class="form-control" value="10000" min="100" max="500000" step="100" required>
+                        <div class="form-item">
+                            <label for="param-feed">Vazão de Alimentação ($F$) <span class="unit">[kg/h]</span></label>
+                            <input type="number" id="param-feed" class="form-input" value="10000" min="500" max="500000" step="500" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-xf">Concentração Inicial (xF) <span class="unit">% m/m</span></label>
-                            <input type="number" id="param-xf" class="form-control" value="10" min="1" max="40" step="0.5" required>
+                        <div class="form-item">
+                            <label for="param-xf">Conc. Inicial ($x_F$) <span class="unit">[% m/m]</span></label>
+                            <input type="number" id="param-xf" class="form-input" value="10" min="1" max="40" step="0.5" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-xn">Concentração Final (xN) <span class="unit">% m/m</span></label>
-                            <input type="number" id="param-xn" class="form-control" value="50" min="15" max="60" step="0.5" required>
+                        <div class="form-item">
+                            <label for="param-xn">Conc. Final ($x_N$) <span class="unit">[% m/m]</span></label>
+                            <input type="number" id="param-xn" class="form-input" value="50" min="15" max="60" step="0.5" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-tf">Temp. Alimentação (TF) <span class="unit">°C</span></label>
-                            <input type="number" id="param-tf" class="form-control" value="50" min="10" max="140" step="1" required>
+                        <div class="form-item">
+                            <label for="param-tf">Temp. Alimentação ($T_F$) <span class="unit">[°C]</span></label>
+                            <input type="number" id="param-tf" class="form-input" value="50" min="10" max="130" step="1" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-ts">Temp. Vapor Vivo (TS) <span class="unit">°C</span></label>
-                            <input type="number" id="param-ts" class="form-control" value="160" min="100" max="200" step="1" required>
+                        <div class="form-item">
+                            <label for="param-ts">Temp. Vapor Vivo ($T_S$) <span class="unit">[°C]</span></label>
+                            <input type="number" id="param-ts" class="form-input" value="160" min="110" max="190" step="1" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-tsat-last">Tsat Último Efeito <span class="unit">°C</span></label>
-                            <input type="number" id="param-tsat-last" class="form-control" value="60" min="30" max="95" step="1" required>
+                        <div class="form-item">
+                            <label for="param-tsat-last">$T_{sat}$ Último Efeito <span class="unit">[°C]</span></label>
+                            <input type="number" id="param-tsat-last" class="form-input" value="60" min="35" max="90" step="1" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-htc">Coeficiente Global (U) <span class="unit">W/(m²·K)</span></label>
-                            <input type="number" id="param-htc" class="form-control" value="2000" min="500" max="5000" step="100" required>
+                        <div class="form-item">
+                            <label for="param-htc">Coeficiente Global ($U$) <span class="unit">[W/(m²·K)]</span></label>
+                            <input type="number" id="param-htc" class="form-input" value="2000" min="800" max="4000" step="100" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="param-omega">Sub-relaxação (ω) <span id="omega-val" class="range-val">0.496</span></label>
-                            <div class="range-wrap">
-                                <input type="range" id="param-omega" min="0.05" max="0.95" step="0.005" value="0.496">
-                            </div>
+                        <div class="form-item">
+                            <label for="param-omega">Sub-relaxação ($\omega$) <span class="unit">[0 a 1]</span></label>
+                            <input type="number" id="param-omega" class="form-input" value="0.496" min="0.05" max="0.95" step="0.005" required>
+                        </div>
+                    </div>
+
+                    <div class="sim-btn-row">
+                        <div class="btn-group">
+                            <button type="submit" id="btn-calculate" class="btn btn-primary" disabled>Executar Dimensionamento</button>
+                            <button type="button" id="btn-reset" class="btn btn-secondary">Restaurar Padrões</button>
                         </div>
 
-                        <div class="sim-actions">
-                            <button type="submit" id="btn-calculate" class="btn btn-primary" disabled>Calcular</button>
-                            <button type="button" id="btn-reset" class="btn btn-secondary">Padrões</button>
+                        <div id="sim-status-box" class="sim-status-box status-running" aria-live="polite">
+                            <span id="status-text">Inicializando WebAssembly...</span>
                         </div>
+                    </div>
+                </form>
+            </div>
 
-                        <div id="sim-status" class="sim-status status-running" aria-live="polite">
-                            <span id="status-text">Carregando núcleo numérico...</span>
-                        </div>
-                    </form>
+            <!-- Resultados da Simulação Atual -->
+            <div class="results-wrapper">
+                <!-- KPIs em Grid Flexível -->
+                <div class="kpi-grid">
+                    <div class="kpi-cell">
+                        <div class="kpi-label">Vapor Vivo ($S$)</div>
+                        <div class="kpi-num"><span id="kpi-steam">-</span><span class="kpi-unit-text">kg/h</span></div>
+                    </div>
+                    <div class="kpi-cell">
+                        <div class="kpi-label">Economia ($E$)</div>
+                        <div class="kpi-num"><span id="kpi-economy">-</span></div>
+                    </div>
+                    <div class="kpi-cell">
+                        <div class="kpi-label">Área por Efeito ($A_i$)</div>
+                        <div class="kpi-num"><span id="kpi-area">-</span><span class="kpi-unit-text">m²</span></div>
+                    </div>
+                    <div class="kpi-cell">
+                        <div class="kpi-label">Área Total ($\sum A_i$)</div>
+                        <div class="kpi-num"><span id="kpi-total-area">-</span><span class="kpi-unit-text">m²</span></div>
+                    </div>
+                    <div class="kpi-cell">
+                        <div class="kpi-label">$\Delta T$ Útil Global</div>
+                        <div class="kpi-num"><span id="kpi-dt">-</span><span class="kpi-unit-text">°C</span></div>
+                    </div>
+                    <div class="kpi-cell">
+                        <div class="kpi-label">Soma de EPEs</div>
+                        <div class="kpi-num"><span id="kpi-bpe">-</span><span class="kpi-unit-text">°C</span></div>
+                    </div>
                 </div>
 
-                <!-- Painel de Resultados da Simulação -->
-                <div class="results-container">
-                    <!-- Cards de KPI -->
-                    <div class="kpi-row">
-                        <div class="kpi-card">
-                            <div class="kpi-label">Vapor Vivo (S)</div>
-                            <div class="kpi-value"><span id="kpi-steam">-</span> <span class="kpi-unit">kg/h</span></div>
+                <!-- Gráficos Responsivos sem Transbordamento -->
+                <div class="charts-wrapper">
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <span class="chart-caption">Perfil Térmico nos Efeitos: $T$ de Ebulição vs $T_{sat}$ Pura</span>
                         </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">Economia de Vapor</div>
-                            <div class="kpi-value"><span id="kpi-economy">-</span></div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">Área por Efeito</div>
-                            <div class="kpi-value"><span id="kpi-area">-</span> <span class="kpi-unit">m²</span></div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">Área Total</div>
-                            <div class="kpi-value"><span id="kpi-total-area">-</span> <span class="kpi-unit">m²</span></div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">ΔT Útil Total</div>
-                            <div class="kpi-value"><span id="kpi-dt">-</span> <span class="kpi-unit">°C</span></div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">Soma das EPEs</div>
-                            <div class="kpi-value"><span id="kpi-bpe">-</span> <span class="kpi-unit">°C</span></div>
+                        <div class="chart-canvas-container">
+                            <canvas id="chart-temperature"></canvas>
                         </div>
                     </div>
 
-                    <!-- Gráficos Canvas -->
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-title">
-                                <span>Perfis Térmicos ao Longo dos Efeitos</span>
-                                <span style="font-weight: normal; color: var(--text-muted); font-size: 0.75rem;">(Ebulição vs Saturação Pura)</span>
-                            </div>
-                            <div class="chart-canvas-wrap">
-                                <canvas id="chart-temperature"></canvas>
-                            </div>
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <span class="chart-caption">Balanço Hidráulico: Vapor Gerado ($V_i$) vs Líquido Residual ($L_i$)</span>
                         </div>
-                        <div class="chart-card">
-                            <div class="chart-title">
-                                <span>Distribuição de Vazões Mássicas</span>
-                                <span style="font-weight: normal; color: var(--text-muted); font-size: 0.75rem;">(Vapor Vᵢ vs Líquido Lᵢ)</span>
-                            </div>
-                            <div class="chart-canvas-wrap">
-                                <canvas id="chart-flows"></canvas>
-                            </div>
+                        <div class="chart-canvas-container">
+                            <canvas id="chart-flows"></canvas>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Tabela de Perfis por Efeito -->
-                    <div class="table-card">
-                        <div class="table-responsive">
-                            <table id="effects-table" class="data-table" aria-label="Resultados detalhados por efeito da simulação atual">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Efeito</th>
-                                        <th scope="col">Vapor V (kg/h)</th>
-                                        <th scope="col">Líquido L (kg/h)</th>
-                                        <th scope="col">Conc. x (% m/m)</th>
-                                        <th scope="col">T Solução (°C)</th>
-                                        <th scope="col">Tsat (°C)</th>
-                                        <th scope="col">Pressão (kPa)</th>
-                                        <th scope="col">EPE (°C)</th>
-                                        <th scope="col">ΔT (°C)</th>
-                                        <th scope="col">Área (m²)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="10" style="text-align: center; color: var(--text-muted);">
-                                            Execute a simulação para visualizar os perfis dos efeitos.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="table-footer-note" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Dimensionamento obtido pelo solver numérico em C (tolerância 10⁻¹⁰).</span>
-                            <div class="export-bar">
-                                <button type="button" id="btn-export-csv" class="btn btn-secondary btn-sm">Exportar CSV</button>
-                                <button type="button" id="btn-export-json" class="btn btn-secondary btn-sm">Exportar JSON</button>
-                            </div>
-                        </div>
+                <!-- Tabela de Perfis por Efeito da Simulação -->
+                <div class="table-scroll-container">
+                    <table id="effects-table" class="academic-table" aria-label="Tabela detalhada de resultados da simulação atual">
+                        <thead>
+                            <tr>
+                                <th scope="col">Efeito</th>
+                                <th scope="col">Vapor $V_i$ (kg/h)</th>
+                                <th scope="col">Líquido $L_i$ (kg/h)</th>
+                                <th scope="col">Concentração $x_i$ (% m/m)</th>
+                                <th scope="col">Temp. Ebulição $T_i$ (°C)</th>
+                                <th scope="col">Temp. Saturação $T_{sat,i}$ (°C)</th>
+                                <th scope="col">Pressão $P_i$ (kPa)</th>
+                                <th scope="col">EPE ($T_i - T_{sat,i}$, °C)</th>
+                                <th scope="col">Força Motriz $\Delta T_i$ (°C)</th>
+                                <th scope="col">Área Calculada $A_i$ (m²)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                                    Aguardando processamento da simulação...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="export-panel">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+                        Critério de parada: tolerância de resíduo de áreas $\le 10^{-10}\text{ m}^2$.
+                    </span>
+                    <div class="btn-group">
+                        <button type="button" id="btn-export-csv" class="btn btn-secondary btn-sm">Exportar Dados (CSV)</button>
+                        <button type="button" id="btn-export-json" class="btn btn-secondary btn-sm">Exportar Dados (JSON)</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seção 4: Modelo Matemático e Hipóteses -->
-    <section id="modelo" style="background-color: var(--bg-surface-alt);">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Rigor Fenomenológico</span>
-                <h2>Modelo Matemático e Hipóteses de Projeto</h2>
-                <p>Formulação dos balanços diferenciais acoplados e correlações termodinâmicas implementadas.</p>
+    <!-- Seção 3: Modelo Matemático com Equações em LaTeX KaTeX (Visual de PDF de Artigo) -->
+    <section id="modelo-matematico" class="content-section">
+        <div class="reading-container">
+            <span class="section-eyebrow">Rigor Fenomenológico</span>
+            <h2 class="section-title">Formulação Matemática Completa</h2>
+            <p class="section-lead">
+                O modelo matemático fundamenta-se nos princípios de conservação da massa, conservação de soluto e primeiro princípio da termodinâmica aplicados a cada estágio em regime estacionário.
+            </p>
+
+            <!-- Equação 1: Balanço Global de Massa -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Balanço Global de Massa por Efeito</span>
+                    <span class="eq-number">(1)</span>
+                </div>
+                <div class="eq-body">
+                    $$L_i + V_i = L_{i-1} \quad (i = 1, 2, \dots, N)$$
+                </div>
+                <div class="eq-notes">
+                    <strong>Onde:</strong> $L_i$ é a vazão mássica de licor efluente do efeito $i$ [kg/h], $V_i$ é a vazão mássica de vapor d'água desprendido [kg/h] e $L_{i-1}$ é a vazão de licor afluente proveniente do efeito anterior. No primeiro efeito ($i=1$), $L_0 = F$ representa a corrente de alimentação da bateria.
+                </div>
             </div>
 
-            <div class="equations-grid">
-                <div class="equation-box">
-                    <div class="eq-title">1. Balanço Global de Massa por Efeito</div>
-                    <div class="eq-math">Lᵢ + Vᵢ = Lᵢ₋₁</div>
-                    <div class="eq-desc">Para cada evaporador, com soluto não volátil. No primeiro efeito, L₀ = F (alimentação).</div>
+            <!-- Equação 2: Balanço de Soluto -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Balanço Mássico de Soluto Não Volátil (NaOH)</span>
+                    <span class="eq-number">(2)</span>
                 </div>
-
-                <div class="equation-box">
-                    <div class="eq-title">2. Balanço de Soluto (NaOH)</div>
-                    <div class="eq-math">Lᵢ · xᵢ = Lᵢ₋₁ · xᵢ₋₁ = F · xF</div>
-                    <div class="eq-desc">O soluto permanece integralmente na fase líquida concentrada, sem arraste na fase vapor.</div>
+                <div class="eq-body">
+                    $$L_i \, x_i = L_{i-1} \, x_{i-1} = F \, x_F$$
                 </div>
-
-                <div class="equation-box">
-                    <div class="eq-title">3. Balanço de Energia Acoplado</div>
-                    <div class="eq-math">Vᵢ · hᵥ,ᵢ + Lᵢ · H_L(Tᵢ, xᵢ) = Vᵢ₋₁ · ΔHᵥₐₚ(Tₛₐₜ,ᵢ₋₁) + Lᵢ₋₁ · H_L(Tᵢ₋₁, xᵢ₋₁)</div>
-                    <div class="eq-desc">Considera o vapor de aquecimento saturado e o vapor gerado no estado de superaquecimento decorrente da EPE.</div>
+                <div class="eq-notes">
+                    <strong>Hipótese:</strong> Como o soluto é considerado rigorosamente não volátil nas temperaturas de operação, não há arraste de hidróxido de sódio na fase vapor ($x_{V,i} = 0$). Consequentemente, para o último estágio ($i=N$), a vazão final de produto é unicamente determinada por:
+                    $$L_N = \frac{F \, x_F}{x_N}$$
                 </div>
+            </div>
 
-                <div class="equation-box">
-                    <div class="eq-title">4. Equação de Dimensionamento Térmico</div>
-                    <div class="eq-math">Aᵢ = Qᵢ / (Uᵢ · ΔTᵢ · 3,6) , com A₁ = A₂ = ... = Aₙ</div>
-                    <div class="eq-desc">O fator 3,6 converte coerentemente a taxa de energia em kJ/h para Watts em compatibilidade com U em W/(m²·K).</div>
+            <!-- Equação 3: Balanço de Energia Acoplado -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Balanço de Energia Entálpico por Efeito</span>
+                    <span class="eq-number">(3)</span>
+                </div>
+                <div class="eq-body">
+                    $$V_i \, h_{v,i}(T_i, P_i) + L_i \, H_L(T_i, x_i) = V_{i-1} \, \Delta H_{vap}(T_{sat,i-1}) + L_{i-1} \, H_L(T_{i-1}, x_{i-1})$$
+                </div>
+                <div class="eq-notes">
+                    <strong>Condição para o 1º efeito ($i=1$):</strong> A fonte de calor provém do vapor vivo de caldeira condensando na temperatura de saturação $T_S$:
+                    $$S = \frac{V_1 \, h_{v,1} + L_1 \, H_L(T_1, x_1) - F \, H_L(T_F, x_F)}{\Delta H_{vap}(T_S)}$$
+                    onde $h_{v,i}$ é a entalpia do vapor gerado (superaquecido devido à EPE), $H_L(T, x)$ é a entalpia específica da solução de NaOH e $\Delta H_{vap}$ é o calor latente de vaporização da água.
+                </div>
+            </div>
+
+            <!-- Equação 4: Dimensionamento Térmico e Fator 3,6 -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Dimensionamento Térmico e Restrição Construtiva de Áreas Iguais</span>
+                    <span class="eq-number">(4)</span>
+                </div>
+                <div class="eq-body">
+                    $$A_i = \frac{Q_i}{U_i \, \Delta T_i \cdot 3,6}, \qquad A_1 = A_2 = \cdots = A_N$$
+                </div>
+                <div class="eq-notes">
+                    <strong>Demonstração do fator $3,6$:</strong> A carga térmica $Q_i$ é obtida do produto entre a vazão mássica em $\text{kg/h}$ e a entalpia em $\text{kJ/kg}$, resultando em $\text{kJ/h}$. Sabendo que $1\text{ W} = 1\text{ J/s} = 3,6\text{ kJ/h}$, a taxa térmica em Watts necessária para compatibilizar com $U$ em $\text{W/(m²·K)}$ requer a divisão exata por $3,6$.
+                </div>
+            </div>
+
+            <!-- Equação 5: Forças Motrizes e EPE -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Gradientes Térmicos Motrizes e Elevação do Ponto de Ebulição</span>
+                    <span class="eq-number">(5)</span>
+                </div>
+                <div class="eq-body">
+                    $$\Delta T_1 = T_S - T_1, \qquad \Delta T_i = T_{sat,i-1} - T_i \quad (i \ge 2)$$
+                    $$EPE_i = T_i - T_{sat,i}$$
+                </div>
+                <div class="eq-notes">
+                    A força motriz total disponível na bateria é deduzida pela soma das quedas de temperatura:
+                    $$\Delta T_{total} = T_S - T_{sat,N} - \sum_{i=1}^N EPE_i$$
+                    demonstrando analiticamente que a EPE consome irreversivelmente o gradiente térmico motriz disponível.
+                </div>
+            </div>
+
+            <!-- Equações Termodinâmicas -->
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Correlações Termodinâmicas Implementadas</span>
+                    <span class="eq-number">(6)</span>
+                </div>
+                <div class="eq-body">
+                    $$\Delta H_{vap}(T) = 2256,47 \left[ \frac{1 - \frac{T + 273,15}{647,096}}{1 - \frac{373,15}{647,096}} \right]^{0,38} \quad [\text{kJ/kg}]$$
+                    $$T_{eb}(P, x) = -190,80153 + \frac{B(x)}{\log_{10}(P) - A(x)} \quad [°\text{C}]$$
+                </div>
+                <div class="eq-notes">
+                    <strong>Termodinâmica da solução de NaOH:</strong>
+                    A entalpia líquida $H_L(T, x)$ utiliza os dados ajustados do *Perry's Chemical Engineers' Handbook*, convertendo a temperatura para Fahrenheit ($T_F = 32 + \frac{9}{5} T_C$) e multiplicando o resultado pelo fator $2,326\text{ kJ/kg}$ por $\text{BTU/lbm}$. A temperatura de ebulição da mistura sob pressão variável adota a correlação cúbica modificada do tipo Antoine ajustada no artigo.
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seção 5: Publicação Científica e Download -->
-    <section id="publicacao">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Comunicação Científica</span>
-                <h2>Publicação e Citação Acadêmica</h2>
-                <p>Trabalho original apresentado no XVI Congresso Brasileiro de Engenharia Química em Iniciação Científica.</p>
-            </div>
+    <!-- Seção 4: Método Numérico Gauss-Seidel SOR -->
+    <section id="metodo-numerico" class="content-section" style="background-color: var(--bg-surface-warm);">
+        <div class="reading-container">
+            <span class="section-eyebrow">Métodos Numéricos</span>
+            <h2 class="section-title">Estratégia de Convergência em Dois Níveis</h2>
+            <p class="section-lead">
+                O solver computacional desacopla o sistema de equações não lineares em um procedimento iterativo duplo com convergência assintótica estável.
+            </p>
 
-            <div class="bib-box">
-                <p><strong>Referência Bibliográfica (ABNT):</strong></p>
-                <p style="margin-top: 0.5rem;">
+            <div class="equation-card">
+                <div class="eq-header">
+                    <span class="eq-title">Sub-relaxação Sucessiva (SOR) nos Balanços Internos</span>
+                    <span class="eq-number">(7)</span>
+                </div>
+                <div class="eq-body">
+                    $$\mathbf{y}^{(k+1)} = \mathbf{y}^{(k)} + \omega \left( \mathbf{y}^{*(k+1)} - \mathbf{y}^{(k)} \right)$$
+                </div>
+                <div class="eq-notes">
+                    <strong>Algoritmo de dois níveis:</strong>
+                    <ol style="margin-left: 1.25rem; margin-top: 0.5rem; line-height: 1.8;">
+                        <li><strong>Laço Interno (Gauss-Seidel SOR):</strong> Para uma distribuição fixada de temperaturas e pressões, resolve iterativamente as vazões mássicas $V_i$, $L_i$ e $S$. O fator $\omega \in (0, 1)$ amortece oscilações causadas pelo forte acoplamento térmico não linear.</li>
+                        <li><strong>Laço Externo (Equalização de Áreas):</strong> Avalia as áreas $A_i$ de cada efeito. Calcula a área média ponderada $A_m = \frac{\sum A_i \Delta T_i}{\sum \Delta T_i}$ e redistribui proporcionalmente as quedas térmicas:
+                        $$\Delta T_i^{(k+1)} = \Delta T_i^{(k)} \cdot \frac{A_i}{A_m}$$
+                        O ciclo se repete até que a máxima discrepância $|A_i - A_j|$ seja inferior a $10^{-10}\text{ m}^2$.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção 5: Autoria, Citação e LinkedIn -->
+    <section id="autoria" class="content-section">
+        <div class="reading-container">
+            <span class="section-eyebrow">Créditos e Comunicação Científica</span>
+            <h2 class="section-title">Autoria e Citação Acadêmica</h2>
+
+            <div style="background-color: #FFFFFF; border: 1px solid var(--border-medium); padding: 1.75rem; margin-top: 1.5rem; border-left: 3px solid var(--accent-blue);">
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem; font-family: var(--font-serif);">Referência Bibliográfica (ABNT)</h3>
+                <p style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);">
                     MENDONÇA, Pedro Paulo Nogueira; DUARTE, Cláudio Roberto. <strong>Projeto de evaporadores de múltiplo efeito com influência da pressão e EPE</strong>. In: XVI Congresso Brasileiro de Engenharia Química em Iniciação Científica (COBEQ-IC). Campinas: UNICAMP, 2026.
                 </p>
-                <div style="margin-top: 1.25rem;">
-                    <a href="artigo-cobeqic-evaporador-multiplo-efeito.pdf" target="_blank" class="btn btn-primary" download>
-                        Baixar Artigo Completo em PDF
+                
+                <div style="margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                    <a href="https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="linkedin-badge"
+                       style="padding: 0.55rem 1rem;">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        Conectar com Pedro Paulo no LinkedIn
+                    </a>
+                    <a href="artigo-cobeqic-evaporador-multiplo-efeito.pdf" target="_blank" download class="btn btn-secondary btn-sm">
+                        Baixar Artigo (PDF)
                     </a>
                 </div>
             </div>
@@ -459,28 +558,41 @@
     </section>
 
     <!-- Rodapé -->
-    <footer>
-        <div class="footer-container">
+    <footer class="site-footer">
+        <div class="footer-inner">
             <div>
-                <div class="footer-brand">Dimensionamento de Evaporadores de Múltiplo Efeito</div>
-                <p style="max-width: 600px; margin-top: 0.5rem; line-height: 1.6;">
-                    Desenvolvido na Faculdade de Engenharia Química (FEQUI) da Universidade Federal de Uberlândia (UFU). Implementação numérica de alto desempenho em C11, auditada e integrada à Web via WebAssembly.
+                <div class="footer-title">Evaporadores de Múltiplo Efeito</div>
+                <p class="footer-desc">
+                    Desenvolvimento computacional de alta performance para a Faculdade de Engenharia Química (FEQUI) da Universidade Federal de Uberlândia (UFU). Implementação do núcleo em C11, validação termodinâmica e compilação para WebAssembly.
+                </p>
+                <p style="font-size: 0.8rem; color: var(--text-on-dark-muted);">
+                    Repositório de código: <a href="https://github.com/ppmend/Evaporador_de_Multiplo_Efeito" target="_blank" rel="noopener noreferrer" style="color: #63B3ED;">github.com/ppmend/Evaporador_de_Multiplo_Efeito</a>
                 </p>
             </div>
+
             <div>
-                <p style="font-weight: 600; color: #FFFFFF; margin-bottom: 0.5rem;">Autores:</p>
-                <p>Pedro Paulo Nogueira Mendonça</p>
-                <p>Prof. Dr. Cláudio Roberto Duarte</p>
-                <p style="margin-top: 1rem; color: var(--text-on-dark-muted);">Universidade Federal de Uberlândia (UFU)</p>
+                <div class="footer-credit-card">
+                    <h4>Autoria e Contato Profissional:</h4>
+                    <p style="color: #FFFFFF; font-weight: 600; margin-bottom: 0.25rem;">Pedro Paulo Nogueira Mendonça</p>
+                    <p style="font-size: 0.8rem; margin-bottom: 0.75rem;">Engenharia Química — UFU</p>
+                    <a href="https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="linkedin-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        Perfil no LinkedIn
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>© 2026 Mendonça & Duarte — Projeto Acadêmico e Científico</span>
-            <span>Núcleo C11 / WebAssembly</span>
+
+        <div class="footer-bottom-bar">
+            <span>© 2026 Mendonça & Duarte — Universidade Federal de Uberlândia (UFU)</span>
+            <span>Núcleo C11 / WebAssembly / KaTeX</span>
         </div>
     </footer>
 
-    <!-- Scripts de Integração -->
+    <!-- Scripts de Integração e Carregamento -->
     <script src="js/evap_solver.js"></script>
     <script src="js/wasm-bridge.js"></script>
     <script src="js/app.js"></script>

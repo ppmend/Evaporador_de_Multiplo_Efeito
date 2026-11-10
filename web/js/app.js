@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 { left: '\\(', right: '\\)', display: false },
                 { left: '$', right: '$', display: false }
             ],
+            macros: { '\\cdotp': '\\cdot' },
+            strict: 'ignore',
             throwOnError: false
         });
     }
@@ -77,6 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Canvas
     const canvasTemp = document.getElementById('chart-temperature');
     const canvasFlow = document.getElementById('chart-flows');
+
+    const CHART_FONT = '10px "JetBrains Mono", monospace';
 
     let currentSimulationResult = null;
 
@@ -239,6 +243,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         drawFlowChart(res);
     }
 
+    /* Legenda com quebra de linha: mede o texto para que os itens nunca se sobreponham */
+    function layoutLegend(ctx, items, x0, x1) {
+        ctx.font = CHART_FONT;
+        let x = x0, row = 0;
+        const pos = items.map((it) => {
+            const w = 12 + ctx.measureText(it.text).width;
+            if (x > x0 && x + w > x1) { row++; x = x0; }
+            const p = { x, row, color: it.color, text: it.text };
+            x += w + 16;
+            return p;
+        });
+        return { pos, rows: row + 1 };
+    }
+
+    function drawLegend(ctx, lay) {
+        ctx.font = CHART_FONT;
+        lay.pos.forEach((p) => {
+            const y = 8 + p.row * 16;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, y, 8, 8);
+            ctx.fillStyle = '#48525E';
+            ctx.fillText(p.text, p.x + 12, y + 8);
+        });
+    }
+
+    function drawEffectLabel(ctx, i, n, x, y, spacing) {
+        if (spacing < 42 && n > 4 && i % 2 === 1) return;
+        ctx.fillStyle = '#1C2024';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Ef. ${i + 1}`, x, y);
+        ctx.textAlign = 'left';
+    }
+
     /* Gráfico 1: Perfis Térmicos Responsivo */
     function drawTemperatureChart(res) {
         if (!canvasTemp || !canvasTemp.parentElement) return;
@@ -255,7 +292,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, dw, dh);
 
-        const padLeft = 45, padRight = 20, padTop = 30, padBottom = 35;
+        const padLeft = 45, padRight = 20, padBottom = 35;
+        const legendT = layoutLegend(ctx, [
+            { color: '#A3361E', text: 'T da solução (com EPE)' },
+            { color: '#143D66', text: 'T sat. (água pura)' }
+        ], padLeft, dw - padRight);
+        const padTop = 18 + legendT.rows * 16;
         const plotW = Math.max(dw - padLeft - padRight, 50);
         const plotH = Math.max(dh - padTop - padBottom, 50);
 
@@ -320,18 +362,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.arc(x, getY(tSol[i]), 3.5, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = '#1C2024';
-            ctx.fillText(`Ef. ${i + 1}`, x - 12, dh - 10);
+            drawEffectLabel(ctx, i, n, x, dh - 10, plotW / Math.max(n - 1, 1));
         }
 
-        // Legenda no topo
-        ctx.fillStyle = '#A3361E';
-        ctx.fillRect(dw - 195, 10, 8, 8);
-        ctx.fillText('T solução (com EPE)', dw - 182, 17);
-
-        ctx.fillStyle = '#143D66';
-        ctx.fillRect(dw - 95, 10, 8, 8);
-        ctx.fillText('Tsat pura', dw - 82, 17);
+        drawLegend(ctx, legendT);
     }
 
     /* Gráfico 2: Vazões Mássicas Responsivo */
@@ -350,7 +384,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, dw, dh);
 
-        const padLeft = 55, padRight = 20, padTop = 30, padBottom = 35;
+        const padLeft = 55, padRight = 20, padBottom = 35;
+        const legendF = layoutLegend(ctx, [
+            { color: '#143D66', text: 'Vapor V (kg/h)' },
+            { color: '#1C5438', text: 'Líquido L (kg/h)' }
+        ], padLeft, dw - padRight);
+        const padTop = 18 + legendF.rows * 16;
         const plotW = Math.max(dw - padLeft - padRight, 50);
         const plotH = Math.max(dh - padTop - padBottom, 50);
 
@@ -391,18 +430,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.fillStyle = '#1C5438';
             ctx.fillRect(groupX + barW + 4, yL, barW, padTop + plotH - yL);
 
-            ctx.fillStyle = '#1C2024';
-            ctx.fillText(`Ef. ${i + 1}`, groupX + barW - 6, dh - 10);
+            drawEffectLabel(ctx, i, n, padLeft + (i + 0.5) * barGroupW, dh - 10, barGroupW);
         });
 
-        // Legenda no topo
-        ctx.fillStyle = '#143D66';
-        ctx.fillRect(dw - 180, 10, 8, 8);
-        ctx.fillText('Vapor V (kg/h)', dw - 167, 17);
-
-        ctx.fillStyle = '#1C5438';
-        ctx.fillRect(dw - 95, 10, 8, 8);
-        ctx.fillText('Líquido L (kg/h)', dw - 82, 17);
+        drawLegend(ctx, legendF);
     }
 
     function exportJson() {

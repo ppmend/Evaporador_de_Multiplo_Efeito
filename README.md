@@ -1,199 +1,74 @@
-# Dimensionamento de Evaporadores de Múltiplo Efeito
+# Evaporadores de Múltiplo Efeito — Simulador Numérico e Site
 
-[![CI Status](https://github.com/ppmend/Evaporador_de_Multiplo_Efeito/actions/workflows/ci.yml/badge.svg)](https://github.com/ppmend/Evaporador_de_Multiplo_Efeito/actions)
-[![Standard C11](https://img.shields.io/badge/C-C11-00599C?logo=c&logoColor=white)](https://en.wikipedia.org/wiki/C11_(C_standard_revision))
-[![WebAssembly](https://img.shields.io/badge/WebAssembly-WASM-654FF0?logo=webassembly&logoColor=white)](https://webassembly.org/)
-[![License: Restrita](https://img.shields.io/badge/License-Sob_Consulta-lightgrey.svg)](#licença)
+Núcleo numérico em C11, compilado para WebAssembly, que dimensiona evaporadores de múltiplo efeito em série com alimentação direta (*forward feed*). O modelo considera pressão variável entre os efeitos, elevação do ponto de ebulição (EPE) de soluções de NaOH e áreas de troca térmica iguais em todos os efeitos. O site apresenta o artigo, o modelo matemático e um simulador que roda no navegador.
 
-Solução computacional acoplada para simulação e dimensionamento de evaporadores de múltiplo efeito em série com alimentação direta (*forward feed*), considerando **pressão variável entre os efeitos**, **elevação do ponto de ebulição (EPE)** e **restrição construtiva de áreas de troca térmica idênticas**.
+Trabalho da Faculdade de Engenharia Química da UFU, publicado no XVI COBEQ-IC (UNICAMP, 2026). O artigo completo está em [`artigo-cobeqic-evaporador-multiplo-efeito.pdf`](artigo-cobeqic-evaporador-multiplo-efeito.pdf).
 
-O projeto reúne um núcleo de cálculo numérico de alto desempenho em C (C11), interface de linha de comando (CLI) completa com suporte a JSON/CSV e modos de varredura (*sweep/benchmark*), e uma aplicação web interativa executada via **WebAssembly** no navegador.
-
-Trabalho desenvolvido no âmbito da Faculdade de Engenharia Química da Universidade Federal de Uberlândia (UFU), publicado no **XVI Congresso Brasileiro de Engenharia Química em Iniciação Científica (COBEQ-IC 2026, UNICAMP)**.
-
----
-
-## 1. Contexto e Motivação de Engenharia Química
-
-A concentração de soluções industriais (como hidróxido de sódio - NaOH, caldo de cana, licor negro) é uma das operações de maior consumo de energia na indústria química. Os sistemas de evaporadores de múltiplo efeito reduzem esse consumo reutilizando o vapor gerado em um efeito como fluido de aquecimento no efeito subsequente.
-
-O dimensionamento rigoroso dessa bateria de trocadores requer o equacionamento acoplado de:
-1. **Balanços materiais globais e de soluto** em cada estágio;
-2. **Balanços de energia não lineares**, considerando calor latente variável e entalpias de vapor superaquecido;
-3. **Elevação do Ponto de Ebulição (EPE)**, que reduz a força motriz térmica útil ($\Delta T$);
-4. **Variação contínua da pressão**, exigindo a reavaliação das propriedades de saturação;
-5. **Critério construtivo de áreas iguais** ($A_1 = A_2 = \cdots = A_N$).
-
----
-
-## 2. Resultados de Referência Publicados (COBEQ-IC 2026)
-
-O solver reproduz com precisão rigorosa os resultados da **Tabela 2** do artigo para o caso-base ($F = 10.000\text{ kg/h}$, $x_F = 10\%$, $x_N = 50\%$, $T_F = 50\text{ °C}$, $T_S = 160\text{ °C}$, $T_{sat,N} = 60\text{ °C}$, $U = 2.000\text{ W/(m²·K)}$):
-
-| Efeitos ($N$) | Área por Efeito ($m^2$) | Vapor Vivo $S$ ($kg/h$) | Economia ($E$) | $\omega$ Ótimo | Área Total Instalada ($m^2$) |
-|:---:|:---:|:---:|:---:|:---:|:---:|
-| **2** | 58,083 | 5.940,4 | 1,3467 | 0,665 | 116,166 |
-| **3** | 70,128 | 4.593,6 | 1,7415 | 0,496 | 210,384 |
-| **4** | 89,608 | 3.949,4 | 2,0256 | 0,445 | 358,432 |
-| **5** | 125,442 | 3.585,8 | 2,2310 | 0,429 | 627,210 |
-| **6** | 211,225 | 3.363,0 | 2,3788 | 0,377 | 1.267,350 |
-| **7** | 684,210 | 3.221,2 | 2,4836 | 0,345 | 4.789,470 |
-
-> **Conclusão Técnica:** Para as condições operacionais estudadas, sistemas entre 3 e 5 efeitos oferecem o melhor compromisso técnico-econômico entre consumo de vapor e área de troca térmica instalada.
-
----
-
-## 3. Arquitetura de Software
+## Conteúdo do repositório
 
 ```text
 .
-├── src/
-│   ├── core/                  # Núcleo numérico (sem estado global, C11)
-│   │   ├── solver.c           # Algoritmo acoplado SOR e equalização de áreas
-│   │   ├── thermodynamics.c   # Modelos termodinâmicos (Antoine, Watson, Perry)
-│   │   ├── validation.c       # Checagens físicas e consistência de domínio
-│   │   └── types.c            # Inicializadores e utilitários de estado
-│   ├── cli/
-│   │   └── main.c             # Interface de linha de comando (CLI)
-│   └── wasm/
-│       └── wasm_api.c         # Camada de integração WebAssembly (Emscripten)
-├── include/evaporator/        # Headers públicos e contratos de dados
-│   ├── solver.h
-│   ├── thermodynamics.h
-│   ├── validation.h
-│   └── types.h
-├── tests/                     # Suite de testes automatizados
-│   ├── test_main.c
-│   ├── test_thermodynamics.c
-│   ├── test_validation.c
-│   └── test_solver_regression.c
-├── docs/                      # Documentação técnica e científica
-│   ├── auditoria-modelo.md
-│   ├── modelo-matematico.md
-│   ├── arquitetura.md
-│   └── validacao-e-testes.md
-├── web/                       # Aplicação Web (HTML5/CSS3/Vanilla JS)
+├── artigo-cobeqic-evaporador-multiplo-efeito.pdf   # artigo publicado
+├── web/                    # site e simulador
 │   ├── index.html
 │   ├── css/style.css
+│   ├── assets/MultiplosEfeitos.png
 │   └── js/
-│       ├── app.js
-│       └── wasm-bridge.js
-├── scripts/
-│   ├── build_wasm.sh
-│   └── run_server.py
-├── CMakeLists.txt
-└── README.md
+│       ├── app.js          # interface, gráficos e exportação
+│       ├── wasm-bridge.js  # ponte JavaScript <-> WebAssembly
+│       ├── evap_solver.js  # módulo gerado pelo Emscripten
+│       └── evap_solver.wasm
+├── src/
+│   ├── core/               # solver, termodinâmica, validação e tipos (C11)
+│   └── wasm/wasm_api.c     # funções exportadas para o navegador
+├── include/evaporator/     # cabeçalhos do núcleo
+└── scripts/build_wasm.sh   # recompila o núcleo para WebAssembly
 ```
 
----
+## Executar o site
 
-## 4. Compilação e Execução Nativa
-
-### Requisitos
-- Compilador C com suporte a **C11** (GCC, Clang ou MSVC);
-- **CMake** versão $\ge 3.15$;
-- Gerador de build (Ninja ou Make).
-
-### Compilação com CMake
-```bash
-# Configuração do projeto
-cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-
-# Compilação dos alvos (lib, cli e testes)
-cmake --build build
-```
-
-### Execução da Suite de Testes
-```bash
-# Executar suite completa
-./build/evap_tests.exe
-# ou via CTest
-ctest --test-dir build --output-on-failure
-```
-
----
-
-## 5. Uso da Linha de Comando (CLI)
-
-O executável `evap_cli` permite simulações pontuais, varredura de relaxação e reprodução direta do artigo:
+O WebAssembly não carrega via `file://`. Na raiz do repositório, inicie um servidor HTTP:
 
 ```bash
-# Simulação padrão de triplo efeito (N=3)
-./build/evap_cli.exe -n 3
-
-# Reprodução completa da Tabela 2 do artigo (N=2 a 7)
-./build/evap_cli.exe --benchmark
-
-# Simulação com parâmetros customizados
-./build/evap_cli.exe -n 4 -F 15000 --xf 0.12 --xn 0.48 --ts 155.0 -w 0.445
-
-# Saída estruturada em JSON (ideal para automações e pipelines)
-./build/evap_cli.exe -n 3 --json
-
-# Saída tabular em CSV
-./build/evap_cli.exe -n 3 --csv
-
-# Varredura do parâmetro de sub-relaxação SOR (omega)
-./build/evap_cli.exe -n 3 --sweep-omega
+python -m http.server 8080
 ```
 
----
+Abra `http://localhost:8080/web/`. O servidor deve partir da raiz porque o botão de download aponta para o PDF que fica ao lado da pasta `web/`.
 
-## 6. Compilação e Uso do Front-End Web (WebAssembly)
+## Recompilar o WebAssembly
 
-### Compilando o Núcleo C para WebAssembly
-Utilize o script automatizado ou invoque o Emscripten (`emcc`):
+Só é necessário ao alterar o código C. Requer o [Emscripten](https://emscripten.org/):
 
 ```bash
 bash scripts/build_wasm.sh
 ```
 
-Isso gerará os artefatos `web/js/evap_solver.js` e `web/js/evap_solver.wasm`.
+O script regenera `web/js/evap_solver.js` e `web/js/evap_solver.wasm`.
 
-### Executando o Servidor Localmente
-Para carregar o WebAssembly no navegador (evitando restrições de CORS de `file://`), inicie um servidor HTTP local:
+## Caso-base e resultados do artigo
 
-```bash
-python scripts/run_server.py
-# ou usando o módulo nativo do Python:
-python -m http.server 8080 --directory web
-```
-Acesse no navegador: `http://localhost:8080`.
+Condições: $F = 10.000\ \text{kg/h}$, $x_F = 10\%$, $x_N = 50\%$, $T_F = 50\ °\text{C}$, $T_S = 160\ °\text{C}$, $T_{sat,N} = 60\ °\text{C}$ e $U = 2.000\ \text{W/(m}^2\text{·K)}$. O simulador reproduz a Tabela 2 do artigo:
 
----
+| Efeitos ($N$) | Área por efeito (m²) | Vapor vivo $S$ (kg/h) | Economia $E$ | $\omega$ ótimo | Área total (m²) |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| 2 | 58,083 | 5.940,4 | 1,3467 | 0,665 | 116,166 |
+| 3 | 70,128 | 4.593,6 | 1,7415 | 0,496 | 210,384 |
+| 4 | 89,608 | 3.949,4 | 2,0256 | 0,445 | 358,432 |
+| 5 | 125,442 | 3.585,8 | 2,2310 | 0,429 | 627,210 |
+| 6 | 211,225 | 3.363,0 | 2,3788 | 0,377 | 1.267,350 |
+| 7 | 684,210 | 3.221,2 | 2,4836 | 0,345 | 4.789,470 |
 
-## 7. Publicação Científica e Citação
+## Citação
 
-Caso utilize este modelo, código ou resultados em trabalhos acadêmicos ou projetos de engenharia, cite o artigo de referência:
-
-### ABNT
 ```text
 MENDONÇA, Pedro Paulo Nogueira; DUARTE, Cláudio Roberto. Projeto de evaporadores de múltiplo efeito com influência da pressão e EPE. In: XVI Congresso Brasileiro de Engenharia Química em Iniciação Científica (COBEQ-IC). Campinas: UNICAMP, 2026.
 ```
 
-### BibTeX
-```bibtex
-@inproceedings{mendonca2026evaporadores,
-  author    = {Mendon{\c{c}}a, Pedro Paulo Nogueira and Duarte, Cl{\'a}udio Roberto},
-  title     = {Projeto de evaporadores de m{\'u}ltiplo efeito com influ{\^e}ncia da press{\~a}o e EPE},
-  booktitle = {Anais do XVI Congresso Brasileiro de Engenharia Qu{\'i}mica em Inicia{\c{c}}{\~a}o Cient{\'i}fica (COBEQ-IC)},
-  year      = {2026},
-  address   = {Campinas, SP},
-  publisher = {UNICAMP}
-}
-```
+## Autores
 
----
+- [Pedro Paulo Nogueira Mendonça](https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/) — UFU. Algoritmo, implementação em C e interface web.
+- Prof. Dr. Cláudio Roberto Duarte — UFU. Orientador.
 
-## 8. Autores e Créditos
+## Licença
 
-- **[Pedro Paulo Nogueira Mendonça](https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/)** — Engenharia Química, UFU (Autor do algoritmo, implementação computacional em C11, interface WebAssembly e coautor da publicação).
-  - LinkedIn: [linkedin.com/in/pedro-paulo-nogueira-mendonça](https://www.linkedin.com/in/pedro-paulo-nogueira-mendon%C3%A7a-866821219/)
-- **Prof. Dr. Cláudio Roberto Duarte** — Faculdade de Engenharia Química, UFU (Coautor e orientador acadêmico).
-
----
-
-## 9. Licença
-
-Todos os direitos do código original e do artigo pertencem aos autores e à Universidade Federal de Uberlândia (UFU). A definição de uma licença de código aberto (ex.: MIT, Apache, GPL) depende de decisão explícita dos titulares dos direitos autorais.
-
+Todos os direitos do código e do artigo pertencem aos autores e à Universidade Federal de Uberlândia. Nenhuma licença de código aberto foi definida.

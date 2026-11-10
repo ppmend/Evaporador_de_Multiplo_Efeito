@@ -1,42 +1,10 @@
-# Build directories
+# Artefatos de compilação e arquivos locais
 build/
-bin/
-lib/
-out/
-dist/
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-
-# Compiladores e binários executáveis
 *.exe
 *.o
 *.obj
 *.a
-*.lib
-*.dll
-*.so
-*.dylib
-
-# Artefatos WebAssembly temporários
-*.wasm.map
-
-# IDE e editores
+*.log
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 .DS_Store
-
-# Logs e arquivos de sistema
-*.log
-original_test.exe
-test_n3.exe
-run_benchmark.exe
-benchmark_article.exe
-original/test_*.c
-original/run_*.c
-original/benchmark_*.c
-

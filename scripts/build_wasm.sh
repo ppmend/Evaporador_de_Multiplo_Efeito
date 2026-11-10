@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-export PATH=/ucrt64/bin:/usr/bin:$PATH
-source /ucrt64/etc/profile.d/emscripten.sh
+# Em MSYS2/UCRT64 o Emscripten é carregado por este profile; nos demais ambientes, use o emcc do PATH.
+if [ -f /ucrt64/etc/profile.d/emscripten.sh ]; then
+    export PATH=/ucrt64/bin:/usr/bin:$PATH
+    source /ucrt64/etc/profile.d/emscripten.sh
+fi
 
 cd "$(dirname "$0")/.."
 
